@@ -21,3 +21,11 @@ Autonomy 是一个尊重个人主权的个人数据自动化框架。
 ### autonomy-core
 
 - [ ] 接受上报数据存入数据库
+
+## 使用
+
+### autonomy-agentd
+
+```
+autonomy-agentd --config config.yaml --workflows workflows_dir
+```

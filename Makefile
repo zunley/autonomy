@@ -9,4 +9,4 @@ autonomy-agent:
 autonomy-core:
 
 lint:
-	find -name \*.go | xargs go fmt
+	find -name \*.go | xargs -L 1 go fmt
