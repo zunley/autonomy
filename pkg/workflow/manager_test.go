@@ -5,7 +5,7 @@ import (
 	"github.com/zunley/autonomy/pkg/types"
 )
 
-func TestWorkflowRun(t *testing.T) {
+func TestManagerAddWorkflow(t *testing.T) {
 
 	wff := &types.Workflow{
 		Name: "TestWorkflowRun",
@@ -19,8 +19,8 @@ func TestWorkflowRun(t *testing.T) {
 		},
 	}
 
-	wf := NewWorkflow(wff)
-	if rst, err := wf.Run(); err != nil {
-		t.Errorf("%+v", *rst)
+	wfm := NewManager()
+	if err := wfm.AddWorkflow(wff); err != nil {
+		t.Errorf("%s", err.Error())
 	}
 }

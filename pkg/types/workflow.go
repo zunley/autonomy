@@ -1,16 +1,18 @@
 package types
 
+import "time"
+
 type Workflow struct {
 	Name        string `yaml:"name"`
 	Description string `yaml:"description"`
 	Schedule    string `yaml:"schedule"`
-	Steps       []step `yaml:"steps"`
+	WorkingDir  string `yaml:"working_dir"`
+	Steps       []Step `yaml:"steps"`
 }
 
 type Step struct {
 	Name       string `yaml:"name"`
 	Shell      string `yaml:shell`
-	WorkingDir string `yaml:"steps"`
 }
 
 type RunResult struct {
@@ -20,4 +22,10 @@ type RunResult struct {
 	StartedAt    time.Time `json:"started_at"`
 	CompletedAt  time.Time `json:"completed_at"`
 	Status       string    `json:"status"` // "success", "failed"
+	StepsOutput  []StepOutput `json:"steps_output"`
+}
+
+type StepOutput struct {
+	Step
+	Output string `json:"output"`
 }

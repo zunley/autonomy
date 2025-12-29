@@ -9,47 +9,51 @@ import (
 )
 
 type Workflow interface {
-	Run() (types.RunResult, error)
+	Run() (*types.RunResult, error)
 }
 
-func NewWorkflow(wf *types.Workflow) Workflow {
-	return nil
+func NewWorkflow(wff *types.Workflow) Workflow {
+	return &workflow{
+		wff: wff,
+	}
 }
 
 type workflow struct {
-	wf *types.Workflow
+	wff *types.Workflow
 }
 
-func (w *workflow) Run() (*types.RunResult, error) {
+func (wf *workflow) Run() (*types.RunResult, error) {
+	wff := wf.wff
 	startTime := time.Now()
-	// TODO
 	runID := uuid.New().String()
-	workDir := wf.WorkingDir
+	workingDir := wff.WorkingDir
+	stepsOutput := make([]types.StepOutput, len(wff.Steps))
 
 	status := "success"
 
-	for i, step := range wf.Steps {
+	for i, step := range wff.Steps {
 		cmd := exec.Command("sh", "-e", "-c", step.Shell)
-		cmd.Dir = workDir
+		cmd.Dir = workingDir
+		output, err := cmd.CombinedOutput()
 
-		output, err := cmd.Combined
-
-		// TODO log 日志
-		fmt.Println(string(output))
+		stepsOutput[i].Name = step.Name
+		stepsOutput[i].Shell = step.Shell
+		stepsOutput[i].Output = string(output)
 
 		if err != nil {
 			status = "failed"
 			break
 		}
+
 	}
 	completedTime := time.Now()
 
 	return &types.RunResult{
-		AgentID:      agentID,
-		WorkflowName: wf.Name,
+		WorkflowName: wff.Name,
 		RunID:        runID,
 		StartedAt:    startTime,
 		CompletedAt:  completedTime,
 		Status:       status,
+		StepsOutput: stepsOutput,
 	}, nil
 }
