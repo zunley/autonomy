@@ -11,17 +11,17 @@ type Workflow struct {
 }
 
 type Step struct {
-	Name       string `yaml:"name"`
-	Shell      string `yaml:shell`
+	Name  string `yaml:"name"`
+	Shell string `yaml:shell`
 }
 
 type RunResult struct {
-	AgentID      string    `json:"agent_id"`
-	WorkflowName string    `json:"workflow_name"`
-	RunID        string    `json:"run_id"`
-	StartedAt    time.Time `json:"started_at"`
-	CompletedAt  time.Time `json:"completed_at"`
-	Status       string    `json:"status"` // "success", "failed"
+	AgentID      string       `json:"agent_id"`
+	WorkflowName string       `json:"workflow_name"`
+	RunID        string       `json:"run_id"`
+	StartedAt    time.Time    `json:"started_at"`
+	CompletedAt  time.Time    `json:"completed_at"`
+	Status       string       `json:"status"` // "success", "failed"
 	StepsOutput  []StepOutput `json:"steps_output"`
 }
 

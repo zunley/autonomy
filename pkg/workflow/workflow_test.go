@@ -1,19 +1,19 @@
 package workflow
 
 import (
-	"testing"
 	"github.com/zunley/autonomy/pkg/types"
+	"testing"
 )
 
 func TestWorkflowRun(t *testing.T) {
 
 	wff := &types.Workflow{
-		Name: "TestWorkflowRun",
-		Schedule: "* * 0/6 * *",
+		Name:       "TestWorkflowRun",
+		Schedule:   "* * 0/6 * *",
 		WorkingDir: "/home",
 		Steps: []types.Step{
 			{
-				Name: "ls",
+				Name:  "ls",
 				Shell: "ls -l",
 			},
 		},

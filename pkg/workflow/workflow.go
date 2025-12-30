@@ -54,6 +54,6 @@ func (wf *workflow) Run() (*types.RunResult, error) {
 		StartedAt:    startTime,
 		CompletedAt:  completedTime,
 		Status:       status,
-		StepsOutput: stepsOutput,
+		StepsOutput:  stepsOutput,
 	}, nil
 }

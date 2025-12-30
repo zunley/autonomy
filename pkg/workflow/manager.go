@@ -1,62 +1,72 @@
 package workflow
 
 import (
-	"github.com/robfig/cron/v3"
 	"github.com/zunley/autonomy/pkg/types"
-	"errors"
-	"fmt"
+	"log"
 )
 
 type Manager interface {
 	Run() error
 	Stop()
 	AddWorkflow(*types.Workflow) error
+	RemoveWorkflow(name string) error
 }
 
-func NewManager() Manager {
+func NewManager(agentConfig *types.AgentConfig) Manager {
 
-	return &workflowManager {
-		schedule: cron.New(),
-		workflows: make(map[cron.EntryID]Workflow),
+	scheduler := NewCronScheduler()
+	uploader := NewHTTPUploader(agentConfig.ControlNode)
+	return &workflowManager{
+		scheduler: scheduler,
+		uploader:  uploader,
+		workflows: make(map[string]Workflow),
 	}
 }
 
 type workflowManager struct {
-	schedule *cron.Cron
-	workflows map[cron.EntryID]Workflow
+	scheduler Scheduler
+	// map[WorkflowName]Workflow
+	workflows map[string]Workflow
+	uploader  Uploader
 }
 
 func (wfm *workflowManager) Run() error {
-	if wfm.schedule != nil {
-		wfm.schedule.Start()
+	if wfm.scheduler != nil {
+		wfm.scheduler.Start()
 	}
 	return nil
 }
 
 func (wfm *workflowManager) Stop() {
-	if wfm.schedule != nil {
-		wfm.schedule.Stop()
+	if wfm.scheduler != nil {
+		wfm.scheduler.Stop()
 	}
 }
 
 func (wfm *workflowManager) AddWorkflow(wff *types.Workflow) error {
-	
-	if _, err := cron.ParseStandard(wff.Schedule); err != nil {
-		s := fmt.Sprintf("Invalid schedule for workflow %s: %s", wff.Name, wff.Schedule)
-		return errors.New(s)
+	if _, ok := wfm.workflows[wff.Name]; ok {
+		return nil
 	}
 
 	wf := NewWorkflow(wff)
-	entryID, err := wfm.schedule.AddFunc(wff.Schedule, func() {
-		rst, _ := wf.Run()
-		// TODO upload
-		fmt.Printf("%+v", rst)
-	})
-	if err != nil {
+	if err := wfm.scheduler.Schedule(wff.Name, wff.Schedule, func() {
+		rst, err := wf.Run()
+		log.Printf("%+v\n", rst)
+		if err != nil {
+			log.Printf("Error RunWorkflow %s: %s", wff.Name, err.Error())
+		}
+		if err := wfm.uploader.Upload(rst); err != nil {
+			log.Printf("Error Upload: %s", err.Error())
+		}
+	}); err != nil {
 		return err
 	}
+	wfm.workflows[wff.Name] = wf
+	log.Printf("Add Workflow: %s\n", wff.Name)
+	return nil
+}
 
-	wfm.workflows[entryID] = wf
-
+func (wfm *workflowManager) RemoveWorkflow(name string) error {
+	log.Fatal("workflowManager:RemoveWorkflow not Implement.")
 	return nil
 }
