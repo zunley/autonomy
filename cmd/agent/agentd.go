@@ -1,7 +1,13 @@
 package agent
 
-import "github.com/zunley/autonomy/pkg/types"
+import (
+	"os"
+	"github.com/zunley/autonomy/pkg/types"
+)
 
+const (
+	DefaultConfigPath = "~/.autonomy/config.yaml"
+)
 func main() {
 
 	var err error
@@ -13,4 +19,10 @@ func main() {
 	defer m.Stop()
 
 	// TODO 阻塞
+}
+
+
+func loadConfig(configPath string) (*types.AgentConfig, error) {
+	data, err := os.ReadFile(configPath)
+	
 }
